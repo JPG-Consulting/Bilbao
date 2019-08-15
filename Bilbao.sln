@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bilbao", "Bilbao\Bilbao.csproj", "{49DD3C50-06F1-466A-A88E-D689035D7C0B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bilbao.Data", "Bilbao.Data\Bilbao.Data.csproj", "{19BCD693-27EA-4353-9971-DAFE0BD46D93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bilbao.Configuration", "Bilbao.Configuration\Bilbao.Configuration.csproj", "{4C6FE101-A5D9-4A58-B3D7-D27B06744792}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bilbao.Web", "Bilbao.Web\Bilbao.Web.csproj", "{16DCE31D-8F6E-44D1-B06B-A883DE40F466}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{49DD3C50-06F1-466A-A88E-D689035D7C0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49DD3C50-06F1-466A-A88E-D689035D7C0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49DD3C50-06F1-466A-A88E-D689035D7C0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49DD3C50-06F1-466A-A88E-D689035D7C0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19BCD693-27EA-4353-9971-DAFE0BD46D93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19BCD693-27EA-4353-9971-DAFE0BD46D93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19BCD693-27EA-4353-9971-DAFE0BD46D93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19BCD693-27EA-4353-9971-DAFE0BD46D93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C6FE101-A5D9-4A58-B3D7-D27B06744792}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C6FE101-A5D9-4A58-B3D7-D27B06744792}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C6FE101-A5D9-4A58-B3D7-D27B06744792}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C6FE101-A5D9-4A58-B3D7-D27B06744792}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16DCE31D-8F6E-44D1-B06B-A883DE40F466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16DCE31D-8F6E-44D1-B06B-A883DE40F466}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16DCE31D-8F6E-44D1-B06B-A883DE40F466}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16DCE31D-8F6E-44D1-B06B-A883DE40F466}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
