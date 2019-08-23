@@ -30,9 +30,12 @@ namespace Bilbao.Web.UI.WebControls
         private int _pageSize = 10;
         private int _pageIndex = 0;
         private long _totalRowCount = 0;
+        private int _displayedPages = 9;
 
         private string _previousText = "«";
         private string _nextText = "»";
+        private string _firstText = "First";
+        private string _lastText = "Last";
 
         private string _cssClass = "paginator";
 
@@ -213,11 +216,14 @@ namespace Bilbao.Web.UI.WebControls
             {
                 EnsureChildControls();
 
-                _pageIndex = 0;
-                _totalRowCount = long.MaxValue;
+                _pageIndex = 1;
+                //_pageIndex = 500000;
+                _totalRowCount = 5000000;
             }
 
             RenderBeginTag(writer);
+
+            RenderContents(writer);
 
             RenderEndTag(writer);    
         }
@@ -237,50 +243,36 @@ namespace Bilbao.Web.UI.WebControls
                 return;
 
             // First
-            writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-item");
-            writer.RenderBeginTag(HtmlTextWriterTag.Li);
-
-            if (_pageIndex > 0)
-            {
-            }
-            else
-            {
-            }
-
-            writer.RenderEndTag();
-
+            RenderFirstButton(writer);
+            
             // Previous button
             RenderPreviousButton(writer);
 
             // Páginas
-            for (int currentPage = 1; currentPage <= this.TotalPageCount; currentPage++)
+            int startPage = (CurrentPage - ((int)Math.Floor(_displayedPages / 2.0m)));
+            if (startPage < 1)
+                startPage = 1;
+            int endPage = startPage + _displayedPages;
+            if (endPage > this.TotalPageCount)
+                endPage = this.TotalPageCount;
+
+            if ((endPage - startPage) < _displayedPages)
+            {
+                startPage = endPage - _displayedPages;
+                if (startPage < 1)
+                    startPage = 1;
+            }
+
+            for (int currentPage = startPage; currentPage <= endPage; currentPage++)
             {
                 RenderPageItem(writer, currentPage, currentPage.ToString(), true);
             }
 
             // Next
             RenderNextButton(writer);
-            
+
             // Last
-            writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-item");
-            writer.RenderBeginTag(HtmlTextWriterTag.Li);
-
-            if (CurrentPage < TotalPageCount)
-            {
-                writer.AddAttribute(HtmlTextWriterAttribute.Href, "#");
-                writer.RenderBeginTag(HtmlTextWriterTag.A);
-                //writer.Write(_nextText);
-                writer.RenderEndTag();
-            }
-            else
-            {
-                writer.AddAttribute(HtmlTextWriterAttribute.Class, "disabled");
-                writer.RenderBeginTag(HtmlTextWriterTag.Span);
-                //writer.Write();
-                writer.RenderEndTag();
-            }
-
-            writer.RenderEndTag();
+            RenderLastButton(writer);
         }
 
         protected virtual void RenderEndTag(HtmlTextWriter writer)
@@ -288,9 +280,19 @@ namespace Bilbao.Web.UI.WebControls
             writer.RenderEndTag();
         }
 
+        private void RenderFirstButton(HtmlTextWriter writer)
+        {
+            RenderButton(writer, GetHref(1), _firstText, (CurrentPage > 1), "First");
+        }
+
+        private void RenderLastButton(HtmlTextWriter writer)
+        {
+            RenderButton(writer, GetHref(this.TotalPageCount), _lastText, (CurrentPage < this.TotalPageCount), "Last");
+        }
+
         private void RenderNextButton(HtmlTextWriter writer)
         {
-            RenderButton(writer, GetHref(CurrentPage + 1), _nextText, ((CurrentPage + 1)>= this.TotalPageCount), "Next");
+            RenderButton(writer, GetHref(CurrentPage + 1), _nextText, (CurrentPage < this.TotalPageCount), "Next");
         }
 
         private void RenderPreviousButton(HtmlTextWriter writer)
