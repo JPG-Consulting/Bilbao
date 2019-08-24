@@ -80,8 +80,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Web\UI\ClientIDMode.cs" />
-    <Compile Include="Web\UI\StandardControl.cs" />
     <Compile Include="Web\UI\WebControls\Pager.cs" />
     <Compile Include="Web\UI\WebUIException.cs" />
     <Compile Include="Web\WebException.cs" />

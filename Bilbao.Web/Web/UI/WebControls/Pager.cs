@@ -21,13 +21,7 @@ namespace Bilbao.Web.UI.WebControls
         Themeable(true),
         SupportsEventValidation
     ]
-    public class Pager
-#if NET35 
-        : StandardControl,
-#else
-        : Control, 
-#endif
-        INamingContainer, System.Web.UI.WebControls.ICompositeControlDesignerAccessor, IPostBackEventHandler
+    public class Pager : Control, INamingContainer, IPostBackEventHandler
     {
         private int _pageSize = 10;
         private int _pageIndex = 0;
@@ -45,7 +39,7 @@ namespace Bilbao.Web.UI.WebControls
         // Visibility
         private bool _renderFirstLastButtons = true;
 
-        private string _cssClass = "paginator";
+        private string _cssClass = "pagination";
 
         /// <summary>
         /// 
