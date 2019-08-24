@@ -34,6 +34,8 @@ namespace Bilbao.Web.UI.WebControls
         private long _totalRowCount = 0;
         private int _displayedPages = 9;
 
+        private bool _usePostBack = true;
+
         // Texts
         private string _previousText = "«";
         private string _nextText = "»";
@@ -169,6 +171,21 @@ namespace Bilbao.Web.UI.WebControls
             }
         }
 
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            // We can't try to find another control in the designer in Init.
+            if (!DesignMode)
+            {
+
+                if (Page != null)
+                {
+                    Page.RegisterRequiresControlState(this);
+                }
+            }
+        }
+
         protected override void LoadControlState(object savedState)
         {
             object[] state = savedState as object[];
@@ -188,7 +205,7 @@ namespace Bilbao.Web.UI.WebControls
                     _pageSize = (int)state[2];
 
                 if (state[3] != null)
-                    _totalRowCount = (long)state[2];
+                    _totalRowCount = (long)state[3];
             }
             else
             {
@@ -307,25 +324,25 @@ namespace Bilbao.Web.UI.WebControls
 
         private void RenderFirstButton(HtmlTextWriter writer)
         {
-            RenderButton(writer, GetHref(1), _firstText, (CurrentPage > 1), "First");
+            RenderButton(writer, 1, _firstText, (CurrentPage > 1), "First");
         }
 
         private void RenderLastButton(HtmlTextWriter writer)
         {
-            RenderButton(writer, GetHref(this.TotalPageCount), _lastText, (CurrentPage < this.TotalPageCount), "Last");
+            RenderButton(writer, this.TotalPageCount, _lastText, (CurrentPage < this.TotalPageCount), "Last");
         }
 
         private void RenderNextButton(HtmlTextWriter writer)
         {
-            RenderButton(writer, GetHref(CurrentPage + 1), _nextText, (CurrentPage < this.TotalPageCount), "Next");
+            RenderButton(writer, CurrentPage + 1, _nextText, (CurrentPage < this.TotalPageCount), "Next");
         }
 
         private void RenderPreviousButton(HtmlTextWriter writer)
         {
-            RenderButton(writer, GetHref(CurrentPage + 1), _previousText, ((CurrentPage -1) > 0), "Previous");
+            RenderButton(writer, CurrentPage - 1, _previousText, ((CurrentPage -1) > 0), "Previous");
         }
 
-        private void RenderButton(HtmlTextWriter writer, string href, string text, bool enabled, string ariaLabel)
+        private void RenderButton(HtmlTextWriter writer, int pageNumber, string text, bool enabled, string ariaLabel)
         {
             if (!enabled)
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-item disabled");
@@ -342,8 +359,12 @@ namespace Bilbao.Web.UI.WebControls
             }
             else
             {
-                writer.AddAttribute(HtmlTextWriterAttribute.Href, href);
+                writer.AddAttribute(HtmlTextWriterAttribute.Href, "#");
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-link");
+
+                if (_usePostBack)
+                    writer.AddAttribute(HtmlTextWriterAttribute.Onclick, Page.ClientScript.GetPostBackEventReference(this, pageNumber.ToString()));
+
                 if (!String.IsNullOrEmpty(ariaLabel))
                     writer.AddAttribute("aria-label", ariaLabel);
                 writer.RenderBeginTag(HtmlTextWriterTag.A);
@@ -365,18 +386,15 @@ namespace Bilbao.Web.UI.WebControls
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-item active");
             else
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-item");
-
-            // PostBack
-            writer.AddAttribute(HtmlTextWriterAttribute.Onclick, Page.ClientScript.GetPostBackEventReference(this, pageNumber.ToString()));
-
+            
             writer.RenderBeginTag(HtmlTextWriterTag.Li);
 
-            RenderPageLink(writer, "#", text, (isActive || (!enabled)));
+            RenderPageLink(writer, pageNumber, text, (isActive || (!enabled)));
 
             writer.RenderEndTag(); // Li
         }
 
-        private void RenderPageLink(HtmlTextWriter writer, string href, string text, bool disabledOrActive)
+        private void RenderPageLink(HtmlTextWriter writer, int pageNumber, string text, bool disabledOrActive)
         {
 
             if (disabledOrActive)
@@ -386,8 +404,12 @@ namespace Bilbao.Web.UI.WebControls
             }
             else
             {
-                writer.AddAttribute(HtmlTextWriterAttribute.Href, href);
+                writer.AddAttribute(HtmlTextWriterAttribute.Href, "#");
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-link");
+
+                if (_usePostBack)
+                    writer.AddAttribute(HtmlTextWriterAttribute.Onclick, Page.ClientScript.GetPostBackEventReference(this, pageNumber.ToString()));
+
                 writer.RenderBeginTag(HtmlTextWriterTag.A);
             }
 
@@ -405,19 +427,14 @@ namespace Bilbao.Web.UI.WebControls
         {
             object baseState = base.SaveControlState();
 
-            if (baseState != null)
-            {
-                object[] state = new object[4];
+            object[] state = new object[4];
 
-                state[0] = baseState;
-                state[1] = (_pageIndex == 0) ? null : (object)_pageIndex;
-                state[2] = (_pageSize == 10) ? null : (object)_pageSize;
-                state[3] = (_totalRowCount < 0) ? null : (object)_totalRowCount;
+            state[0] = baseState;
+            state[1] = (_pageIndex == 0) ? null : (object)_pageIndex;
+            state[2] = (_pageSize == 10) ? null : (object)_pageSize;
+            state[3] = (_totalRowCount < 0) ? null : (object)_totalRowCount;
 
-                return state;
-            }
-
-            return baseState;
+            return state;
         }
 
         private bool ShouldRenderFirstLastButtons()
