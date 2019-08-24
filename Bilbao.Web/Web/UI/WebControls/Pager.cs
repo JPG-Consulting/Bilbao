@@ -13,6 +13,8 @@ namespace Bilbao.Web.UI.WebControls
     ///     <a href="https://docs.microsoft.com/es-es/dotnet/api/system.web.ui.webcontrols.datapager?view=netframework-4.8">DataPager</a>.
     ///   </para>
     /// </remarks>
+    [ToolboxData("<{0}:Pager runat=server></{0}:Pager>")]
+    [ToolboxItem(true)]
     [
         ParseChildren(true),
         PersistChildren(false),
@@ -25,17 +27,21 @@ namespace Bilbao.Web.UI.WebControls
 #else
         : Control, 
 #endif
-        INamingContainer, System.Web.UI.WebControls.ICompositeControlDesignerAccessor
+        INamingContainer, System.Web.UI.WebControls.ICompositeControlDesignerAccessor, IPostBackEventHandler
     {
         private int _pageSize = 10;
         private int _pageIndex = 0;
         private long _totalRowCount = 0;
         private int _displayedPages = 9;
 
+        // Texts
         private string _previousText = "«";
         private string _nextText = "»";
         private string _firstText = "First";
         private string _lastText = "Last";
+
+        // Visibility
+        private bool _renderFirstLastButtons = true;
 
         private string _cssClass = "paginator";
 
@@ -116,6 +122,20 @@ namespace Bilbao.Web.UI.WebControls
             }
         }
         
+        [DefaultValue(true)]
+        public bool RenderFirstLastButtons
+        {
+            get
+            {
+                return _renderFirstLastButtons;
+            }
+
+            set
+            {
+                _renderFirstLastButtons = value;
+            }
+        }
+
         public long StartRowIndex
         {
             get { return (_pageIndex * _pageSize); }
@@ -212,6 +232,7 @@ namespace Bilbao.Web.UI.WebControls
 
         protected override void Render(HtmlTextWriter writer)
         {
+
             if (DesignMode)
             {
                 EnsureChildControls();
@@ -243,22 +264,24 @@ namespace Bilbao.Web.UI.WebControls
                 return;
 
             // First
-            RenderFirstButton(writer);
-            
+            if (ShouldRenderFirstLastButtons())
+                RenderFirstButton(writer);
+
             // Previous button
-            RenderPreviousButton(writer);
+            if (this.TotalPageCount > 1)
+                RenderPreviousButton(writer);
 
             // Páginas
             int startPage = (CurrentPage - ((int)Math.Floor(_displayedPages / 2.0m)));
             if (startPage < 1)
                 startPage = 1;
-            int endPage = startPage + _displayedPages;
+            int endPage = startPage + (_displayedPages -1);
             if (endPage > this.TotalPageCount)
                 endPage = this.TotalPageCount;
 
             if ((endPage - startPage) < _displayedPages)
             {
-                startPage = endPage - _displayedPages;
+                startPage = endPage - (_displayedPages - 1);
                 if (startPage < 1)
                     startPage = 1;
             }
@@ -269,10 +292,12 @@ namespace Bilbao.Web.UI.WebControls
             }
 
             // Next
-            RenderNextButton(writer);
+            if (this.TotalPageCount > 1)
+                RenderNextButton(writer);
 
             // Last
-            RenderLastButton(writer);
+            if (ShouldRenderFirstLastButtons())
+                RenderLastButton(writer);
         }
 
         protected virtual void RenderEndTag(HtmlTextWriter writer)
@@ -341,6 +366,9 @@ namespace Bilbao.Web.UI.WebControls
             else
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-item");
 
+            // PostBack
+            writer.AddAttribute(HtmlTextWriterAttribute.Onclick, Page.ClientScript.GetPostBackEventReference(this, pageNumber.ToString()));
+
             writer.RenderBeginTag(HtmlTextWriterTag.Li);
 
             RenderPageLink(writer, "#", text, (isActive || (!enabled)));
@@ -390,6 +418,34 @@ namespace Bilbao.Web.UI.WebControls
             }
 
             return baseState;
+        }
+
+        private bool ShouldRenderFirstLastButtons()
+        {
+            if (!_renderFirstLastButtons)
+                return false;
+            else if (this.TotalPageCount <= _displayedPages)
+                return false;
+            else
+                return true;
+        }
+
+        public void RaisePostBackEvent(string eventArgument)
+        {
+#if NET35
+            if ((eventArgument == null) || (eventArgument.Trim().Length == 0))
+#else
+            if (String.IsNullOrWhiteSpace(eventArgument))
+#endif
+                return;
+
+
+            int currentPage;
+
+            if ((int.TryParse(eventArgument, out currentPage)) && (currentPage > 0))
+            {
+                this.CurrentPage = currentPage;
+            }
         }
     }
 }

@@ -12,6 +12,8 @@ namespace Bilbao.Web.UI
     /// <remarks>
     ///   Este control introduce cambios que se presentan en NET Framework 4.0 y posteriores.
     /// </remarks>
+    [ToolboxItem(false)]
+    [Serializable]
     public class StandardControl : System.Web.UI.Control
     {
 
