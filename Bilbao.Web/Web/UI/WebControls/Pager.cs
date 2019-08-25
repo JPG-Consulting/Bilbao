@@ -28,6 +28,8 @@ namespace Bilbao.Web.UI.WebControls
         private long _totalRowCount = 0;
         private int _displayedPages = 9;
 
+        private bool _renderAsTable = false;
+
         private bool _usePostBack = true;
 
         private string _onClientClick = string.Empty;
@@ -214,6 +216,9 @@ namespace Bilbao.Web.UI.WebControls
 
                 if (state[3] != null)
                     _totalRowCount = (long)state[3];
+
+                if (state[4] != null)
+                    _renderAsTable = (bool)state[4];
             }
             else
             {
@@ -265,6 +270,8 @@ namespace Bilbao.Web.UI.WebControls
                 _pageIndex = 1;
                 //_pageIndex = 500000;
                 _totalRowCount = 5000000;
+
+                _renderAsTable = true;
             }
 
             RenderBeginTag(writer);
@@ -280,7 +287,16 @@ namespace Bilbao.Web.UI.WebControls
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, this.CssClass);
 
             writer.AddAttribute(HtmlTextWriterAttribute.Id, ClientID);
-            writer.RenderBeginTag(HtmlTextWriterTag.Ul);
+
+            if (_renderAsTable)
+            {
+                writer.RenderBeginTag(HtmlTextWriterTag.Table);
+                writer.RenderBeginTag(HtmlTextWriterTag.Tr);
+            }
+            else
+            {
+                writer.RenderBeginTag(HtmlTextWriterTag.Ul);
+            }
         }
 
         protected virtual void RenderContents(HtmlTextWriter writer)
@@ -328,6 +344,9 @@ namespace Bilbao.Web.UI.WebControls
         protected virtual void RenderEndTag(HtmlTextWriter writer)
         {
             writer.RenderEndTag();
+
+            if (_renderAsTable)
+                writer.RenderEndTag();
         }
 
         private void RenderFirstButton(HtmlTextWriter writer)
@@ -357,7 +376,10 @@ namespace Bilbao.Web.UI.WebControls
             else
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-item");
 
-            writer.RenderBeginTag(HtmlTextWriterTag.Li);
+            if (_renderAsTable)
+                writer.RenderBeginTag(HtmlTextWriterTag.Td);
+            else
+                writer.RenderBeginTag(HtmlTextWriterTag.Li);
 
             // A tag - start
             if (!enabled)
@@ -398,8 +420,11 @@ namespace Bilbao.Web.UI.WebControls
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-item active");
             else
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-item");
-            
-            writer.RenderBeginTag(HtmlTextWriterTag.Li);
+
+            if (_renderAsTable)
+                writer.RenderBeginTag(HtmlTextWriterTag.Td);
+            else        
+                writer.RenderBeginTag(HtmlTextWriterTag.Li);
 
             RenderPageLink(writer, pageNumber, text, (isActive || (!enabled)));
 
@@ -443,12 +468,13 @@ namespace Bilbao.Web.UI.WebControls
         {
             object baseState = base.SaveControlState();
 
-            object[] state = new object[4];
+            object[] state = new object[5];
 
             state[0] = baseState;
             state[1] = (_pageIndex == 0) ? null : (object)_pageIndex;
             state[2] = (_pageSize == 10) ? null : (object)_pageSize;
             state[3] = (_totalRowCount < 0) ? null : (object)_totalRowCount;
+            state[4] = (object)_renderAsTable;
 
             return state;
         }
