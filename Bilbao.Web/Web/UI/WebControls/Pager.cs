@@ -13,8 +13,8 @@ namespace Bilbao.Web.UI.WebControls
     ///     <a href="https://docs.microsoft.com/es-es/dotnet/api/system.web.ui.webcontrols.datapager?view=netframework-4.8">DataPager</a>.
     ///   </para>
     /// </remarks>
-    [ToolboxData("<{0}:Pager runat=server></{0}:Pager>")]
-    [ToolboxItem(true)]
+    //[ToolboxData("<{0}:Pager runat=server></{0}:Pager>")]
+    //[ToolboxItem(true)]
     [
         ParseChildren(true),
         PersistChildren(false),
@@ -29,6 +29,8 @@ namespace Bilbao.Web.UI.WebControls
         private int _displayedPages = 9;
 
         private bool _usePostBack = true;
+
+        private string _onClientClick = string.Empty;
 
         // Texts
         private string _previousText = "«";
@@ -83,6 +85,18 @@ namespace Bilbao.Web.UI.WebControls
                     _cssClass = string.Empty;
                 else
                     _cssClass = value.Trim();
+            }
+        }
+
+        public string OnClientClient
+        {
+            get { return (_onClientClick != null) ? _onClientClick.Trim() : string.Empty; }
+            set
+            {
+                if (value == null)
+                    _onClientClick = string.Empty;
+                else
+                    _onClientClick = value.Trim();
             }
         }
 
@@ -356,8 +370,12 @@ namespace Bilbao.Web.UI.WebControls
                 writer.AddAttribute(HtmlTextWriterAttribute.Href, "#");
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-link");
 
-                if (_usePostBack)
+                if (_usePostBack && (String.IsNullOrEmpty(OnClientClient)))
                     writer.AddAttribute(HtmlTextWriterAttribute.Onclick, Page.ClientScript.GetPostBackEventReference(this, pageNumber.ToString()));
+                else if (_usePostBack)
+                    writer.AddAttribute(HtmlTextWriterAttribute.Onclick, OnClientClient + (!OnClientClient.EndsWith(";") ? ";" : "") + Page.ClientScript.GetPostBackEventReference(this, pageNumber.ToString()));
+                else if (!String.IsNullOrEmpty(OnClientClient))
+                    writer.AddAttribute(HtmlTextWriterAttribute.Onclick, OnClientClient);
 
                 if (!String.IsNullOrEmpty(ariaLabel))
                     writer.AddAttribute("aria-label", ariaLabel);
@@ -401,8 +419,12 @@ namespace Bilbao.Web.UI.WebControls
                 writer.AddAttribute(HtmlTextWriterAttribute.Href, "#");
                 writer.AddAttribute(HtmlTextWriterAttribute.Class, "page-link");
 
-                if (_usePostBack)
+                if (_usePostBack && (String.IsNullOrEmpty(OnClientClient)))
                     writer.AddAttribute(HtmlTextWriterAttribute.Onclick, Page.ClientScript.GetPostBackEventReference(this, pageNumber.ToString()));
+                else if (_usePostBack)
+                    writer.AddAttribute(HtmlTextWriterAttribute.Onclick, OnClientClient + (!OnClientClient.EndsWith(";") ? ";" : "") +  Page.ClientScript.GetPostBackEventReference(this, pageNumber.ToString()));
+                else if (!String.IsNullOrEmpty(OnClientClient))
+                    writer.AddAttribute(HtmlTextWriterAttribute.Onclick, OnClientClient);
 
                 writer.RenderBeginTag(HtmlTextWriterTag.A);
             }
