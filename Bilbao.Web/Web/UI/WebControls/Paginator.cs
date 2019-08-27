@@ -370,14 +370,28 @@ namespace Bilbao.Web.UI.WebControls
                 return;
 
             // Create the event arguments.
-            PageChangedEventArgs eventArgs = new PageChangedEventArgs(pageNumber, _totalPageCount);
+            PageChangedEventArgs eventArgs = new PageChangedEventArgs(pageNumber, _totalRowCount);
 
             // Raise event.
             OnPageChanged(eventArgs);
 
+            // Ha cambiado el numero de registros?
+            if (eventArgs.TotalRowCount != this.TotalRowCount)
+            {
+                _totalRowCount = eventArgs.TotalRowCount;
+            }
+
             // Establecer la página actual.
-            if (_currentPageNumber != eventArgs.CurrentPage)
-                this.CurrentPageNumber = eventArgs.CurrentPage;
+            if (_currentPageNumber != eventArgs.CurrentPageNumber)
+                _currentPageNumber = eventArgs.CurrentPageNumber;
+
+            // Calculamos el número de páginas
+            _totalPageCount = (int)Math.Ceiling(_totalRowCount / (double)_pageSize);
+
+            if (_currentPageNumber > _totalPageCount)
+                _currentPageNumber = _totalPageCount;
+            else if (_currentPageNumber < 1)
+                _currentPageNumber = 1;
         }
 
         protected override object SaveControlState()
