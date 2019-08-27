@@ -11,6 +11,7 @@ namespace Bilbao.Web.UI.WebControls
     public class TableView : CompositeDataBoundControl
     {
         private DataControlFieldCollection _fieldCollection;
+        private TableItemStyle _headerStyle;
 
         [
             DefaultValue(null),
@@ -32,6 +33,29 @@ namespace Bilbao.Web.UI.WebControls
                         ((IStateManager)_fieldCollection).TrackViewState();
                 }
                 return _fieldCollection;
+            }
+        }
+
+        [
+            //WebCategory("Styles"),
+            DefaultValue(null),
+            DesignerSerializationVisibility(DesignerSerializationVisibility.Content),
+            NotifyParentProperty(true),
+            PersistenceMode(PersistenceMode.InnerProperty),
+            //WebSysDescription(SR.DataControls_HeaderStyle)
+        ]
+        public virtual TableItemStyle HeaderStyle
+        {
+            get
+            {
+                if (_headerStyle == null)
+                {
+                    _headerStyle = new TableItemStyle();
+                    if (IsTrackingViewState)
+                        ((IStateManager)_headerStyle).TrackViewState();
+                }
+
+                return _headerStyle;
             }
         }
 
@@ -123,6 +147,16 @@ namespace Bilbao.Web.UI.WebControls
             {
                 if (column.Visible)
                 {
+                    if (HeaderStyle != null)
+                    {
+#if NET35
+                        if ((HeaderStyle.CssClass != null) && (HeaderStyle.CssClass.Trim().Length > 0))
+#else
+                        if (!string.IsNullOrWhiteSpace(HeaderStyle.CssClass))
+#endif
+                            writer.AddAttribute(HtmlTextWriterAttribute.Class, HeaderStyle.CssClass);
+                    }
+
                     writer.RenderBeginTag(HtmlTextWriterTag.Th);
 
                     if (column.ShowHeader)
